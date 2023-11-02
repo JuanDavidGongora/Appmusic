@@ -18,7 +18,7 @@ const PrincipalLayout = ({children}) => {
 
   useEffect (() => {
     if(isShowAuth) {
-      if(isShowPlaylist) isShowPlaylist(false);
+      if(isShowPlaylist) setIsShowPlaylist(false);
     }
   }, [isShowAuth]);
 
