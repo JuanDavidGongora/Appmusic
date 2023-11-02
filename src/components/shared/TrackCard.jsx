@@ -1,28 +1,46 @@
 import { Link } from "react-router-dom"
-import { AddIcon, PlayIcon } from "../icons/Svgs"
+import { AddIcon, MinusIcon, PlayIcon } from "../icons/Svgs"
+import { addTrack, removeTrack } from "../../store/slices/playlistCart.slice";
+import { useDispatch } from "react-redux";
 
-const TrackCard = ({track}) => {
+const TrackCard = ({track, showPlayBtn, showAddBtn, imageSize = "base", 
+showMinusBtn, deleteBtn, playTrack}) => {
+    const dispatch = useDispatch();
+    const handleAddTrack = () => {
+      dispatch(addTrack(track));  
+    };
 
-  const lastIndexArtist = track.artist.length - 1
+    const handleRemoveTrack = () => {
+        dispatch((removeTrack)(track.id));
+    }
+
+    const imageSizes = {
+        base: "w-[58px] h-[58px]",
+        sm: "w-[48px] h-[48px]",
+    };
 
   return (
-    <article className="flex gap-4 items-center ">
+    <article className="flex gap-4 items-center hover:bg-white/20 transition-colors rounded-md p-1 ">
 
         {/*Imagen de la cancion */}
-        <div className="w-[58px] h-[58px] rounded-md overflow-hidden ">
+        <div className={`w-[58px] h-[58px] rounded-md overflow-hidden ${imageSizes[imageSize]} `}>
             <img src={track.album.images[2].url} alt="" />
         </div>
 
          {/*Detalle de la cancion */}
         <div className=" flex-1 text-sm grid gap-1">
-            <h4 className="font-semibold line-clamp-1">{track.name}</h4>
-            {/*<h5 className="text-slate-400 
-            line-clamp-1">{track.artists[0].name}</h5>*/}
+            <Link to={`/tracks/${track.id}`} className="font-semibold line-clamp-1
+            hover:text-secondary transition-colors">
+                {track.name}
+                </Link>
+           
             <ul className="flex gap-2">
-                {track.artists.map((artist, index) => (
+                {track.artists.slice(0, 2).map((artist, index, array) => (
                         <li key={artist.id}>
-                            <Link to={`/artists/${artist.id}`}>
-                                {artist.name} {lastIndexArtist !== index && "," }
+                            <Link className="hover:text-secondary transition-colors
+                            line-clamp-1"
+                              to={`/artists/${artist.id}`}>
+                                {artist.name} {array.length - 1 !== index && "," }
                             </Link>
                         </li>
                     ))}
@@ -31,12 +49,41 @@ const TrackCard = ({track}) => {
 
          {/*Botones*/}
         <div className="flex gap-2 pr-1">
-            <button>
-                <PlayIcon/>
-            </button>
-            <button>
-                <AddIcon/>
-            </button>
+            {showPlayBtn && (
+                    <button>
+                    <PlayIcon/>
+                </button>
+                )}
+
+                {showAddBtn && (
+                     <button onClick={handleAddTrack}>
+                     <AddIcon/>
+                 </button>
+
+                )}
+
+                {
+                    showMinusBtn && (
+                        <button onClick={handleRemoveTrack}>
+                        <MinusIcon/>
+                    </button>
+                    )
+                }
+
+                {
+                    deleteBtn && (<button onClick={() => deleteBtn(track.id)}>
+                        <MinusIcon/>
+                    </button>)
+                }
+
+                {
+                    playTrack && (
+                        <button onClick={() => playTrack(track.spotifyId)}>
+                    <PlayIcon/>
+                </button>
+                    )}
+
+               
         </div>
     </article>
   )
